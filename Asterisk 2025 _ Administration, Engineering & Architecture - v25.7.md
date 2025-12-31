@@ -1,6 +1,6 @@
 # **Asterisk 2025 : Administration, Engineering & Architecture**
 
-**Support de Cours et Laboratoire Pratique - Édition Expert (Validée, Corrigée & Augmentée)**
+**Support de Cours et Laboratoire Pratique**
 
 Ce document sert de référence technique exhaustive pour les ingénieurs télécoms, administrateurs système et architectes VoIP souhaitant déployer, sécuriser et maintenir une infrastructure de téléphonie critique.
 
