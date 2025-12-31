@@ -1,7 +1,3 @@
-Voici le document complet, sans aucune suppression de texte, formaté rigoureusement en Markdown pour une intégration directe dans Git (GitLab/GitHub). J'ai utilisé des blocs de code pour les configurations et les commandes afin de garantir la lisibilité technique.
-
----
-
 # **Asterisk 2025 : Administration, Engineering & Architecture**
 
 **Support de Cours et Laboratoire Pratique - Édition Expert (Validée, Corrigée & Augmentée)**
