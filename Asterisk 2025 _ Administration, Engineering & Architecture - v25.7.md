@@ -148,7 +148,10 @@ systemctl disable apparmor
 # 4. (Recommandé) Désinstaller AppArmor pour éviter tout conflit futur
 apt remove apparmor -y
 
-# 5. Installation des Dépendances de CompilationAsterisk 22 nécessite un environnement de compilation complet. Nous allons installer les outils de base, puis utiliser le script officiel d'Asterisk pour gérer les dépendances complexes (PJSIP, Jansson, SRTP, etc.).# 1. Installer les outils de base pour récupérer les sources
+# 5. Installation des Dépendances de CompilationAsterisk 22 nécessite un environnement de compilation complet.
+# Nous allons installer les outils de base, puis utiliser le script officiel d'Asterisk pour gérer les dépendances complexes (PJSIP, Jansson, SRTP, etc.)
+# Installer les outils de base pour récupérer les sources
+
 apt install git curl wget build-essential subversion -y
 
 # 6. Se placer dans le répertoire des sources
@@ -168,8 +171,11 @@ cd asterisk-22.*/
 
 contrib/scripts/install_prereq install
 
-(Attendez le message "install completed successfully" avant de continuer)3. Configuration et Choix des ModulesConfiguration du moteur de compilation. Nous forçons l'utilisation des versions "bundled" (incluses) de PJPROJECT et JANSSON pour éviter les incompatibilités avec les versions des dépôts Debian.# 1. (Optionnel) Récupérer les sources MP3
+# (Attendez le message "install completed successfully" avant de continuer)3. Configuration et Choix des ModulesConfiguration du moteur de compilation.
+# Nous forçons l'utilisation des versions "bundled" (incluses) de PJPROJECT et JANSSON pour éviter les incompatibilités avec les versions des dépôts Debian.
+# (Optionnel) Récupérer les sources MP3
 # Nécessaire uniquement pour les musiques d'attente MP3 (non recommandé en prod, préférez WAV)
+
 contrib/scripts/get_mp3_source.sh
 
 # 11. Configuration de l'environnement
@@ -178,10 +184,19 @@ contrib/scripts/get_mp3_source.sh
 
 ./configure --with-jansson-bundled --with-pjproject-bundled
 
-Une fois le ./configure terminé (logo Asterisk affiché), lancez le menu :make menuselect
-Dans l'interface graphique (Menuselect) :Add-ons : Cochez format_mp3 (si étape 1 réalisée).Core Sound Packages :Décochez CORE-SOUNDS-EN-GSM.Cochez CORE-SOUNDS-FR-WAV (Standard).Cochez CORE-SOUNDS-FR-G722 (Haute Définition).Music On Hold File Packages :Cochez MOH-OPSOUND-WAV.Save & Exit
+# Une fois le ./configure terminé (logo Asterisk affiché), lancez le menu :
 
-# 12. Compilation et InstallationCette étape compile le code source. Comptez 5 à 15 minutes.# 1. Compilation
+make menuselect
+
+# Dans l'interface graphique (Menuselect) : Add-ons :
+# Cochez format_mp3 (si étape 1 réalisée).
+# Core Sound Packages
+# Décochez CORE-SOUNDS-EN-GSM.Cochez CORE-SOUNDS-FR-WAV (Standard).
+# Cochez CORE-SOUNDS-FR-G722 (Haute Définition).
+# Music On Hold File Packages : Cochez MOH-OPSOUND-WAV.
+# Save & Exit
+
+# 12. Compilation et InstallationCette étape compile le code source. (Comptez 5 à 15 minutes)
 make
 
 # 13. Installation des binaires
@@ -197,9 +212,9 @@ make config
 # 16. Mise à jour des liens des librairies partagées
 ldconfig
 
-# 17. Création de l'utilisateur Asterisk (Sécurité)Faire tourner Asterisk en root est dangereux. Nous créons un utilisateur système dédié avec les droits audio.
-
-# 18. Créer le groupe et l'utilisateur système
+# 17. Création de l'utilisateur Asterisk (Sécurité)
+# Faire tourner Asterisk en root est dangereux. Nous créons un utilisateur système dédié avec les droits audio.
+# Créer le groupe et l'utilisateur système
 
 groupadd asterisk
 useradd -r -d /var/lib/asterisk -g asterisk asterisk
@@ -212,12 +227,12 @@ chown -R asterisk:asterisk /etc/asterisk
 chown -R asterisk:asterisk /var/{lib,log,spool}/asterisk
 chown -R asterisk:asterisk /usr/lib/asterisk
 
-Configuration du service pour utiliser cet utilisateur : Éditez le fichier de configuration par défaut :nano /etc/default/asterisk
-Trouvez et décommentez (enlevez le #) les lignes suivantes pour qu'elles ressemblent à ceci :AST_USER="asterisk"
+# Configuration du service pour utiliser cet utilisateur : Éditez le fichier de configuration par défaut :nano /etc/default/asterisk
+# Trouvez et décommentez (enlevez le #) les lignes suivantes pour qu'elles ressemblent à ceci :AST_USER="asterisk"
 
 AST_GROUP="asterisk"
 
-Sauvegardez (CTRL+O, Entrée) et quittez (CTRL+X).6. Démarrage et Vérification# 1. Démarrer le service
+# Sauvegardez (CTRL+O, Entrée) et quittez (CTRL+X).6. Démarrage et Vérification# 1. Démarrer le service
 
 systemctl start asterisk
 
@@ -230,10 +245,11 @@ systemctl enable asterisk
 # 22. Se connecter à la console Asterisk (CLI)
 asterisk -rvvv
 
-Si le prompt affiche CLI>, Asterisk 22 est fonctionnel.7. Nettoyage Post-Installation (Pour le Lab)Pour suivre la Masterclass proprement, nous archivons les configurations d'exemple pour créer nos propres fichiers.cd /etc/asterisk
+# Si le prompt affiche CLI>, Asterisk 22 est fonctionnel.7. Nettoyage Post-Installation (Pour le Lab)Pour suivre la Masterclass proprement, nous archivons # les configurations d'exemple pour créer nos propres fichiers.cd /etc/asterisk
 
 mkdir original_samples
 mv * original_samples/ 2>/dev/null
+
 # Le dossier est maintenant vide, prêt pour la création de pjsip.conf
 
 # 23. Outils d'analyse "Forensic"
