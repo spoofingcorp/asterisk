@@ -135,7 +135,6 @@ Pour supporter la charge :
 ### **3.1 Installation sur Debian 12**
 
 ```bash
-
 # 1. Passer en root (si ce n'est pas déjà fait)
 su -
 
@@ -149,7 +148,7 @@ systemctl disable apparmor
 # 4. (Recommandé) Désinstaller AppArmor pour éviter tout conflit futur
 apt remove apparmor -y
 
-5. Installation des Dépendances de CompilationAsterisk 22 nécessite un environnement de compilation complet. Nous allons installer les outils de base, puis utiliser le script officiel d'Asterisk pour gérer les dépendances complexes (PJSIP, Jansson, SRTP, etc.).# 1. Installer les outils de base pour récupérer les sources
+# 5. Installation des Dépendances de CompilationAsterisk 22 nécessite un environnement de compilation complet. Nous allons installer les outils de base, puis utiliser le script officiel d'Asterisk pour gérer les dépendances complexes (PJSIP, Jansson, SRTP, etc.).# 1. Installer les outils de base pour récupérer les sources
 apt install git curl wget build-essential subversion -y
 
 # 6. Se placer dans le répertoire des sources
