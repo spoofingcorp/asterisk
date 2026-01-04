@@ -325,7 +325,7 @@ auth=auth6001
 aors=6001
 [auth6001]
 type=auth
-auth_type=password
+auth_type=userpass
 password=ComplexPassAlice_2025!
 username=6001
 [6001]
@@ -337,7 +337,7 @@ auth=auth6002
 aors=6002
 [auth6002]
 type=auth
-auth_type=password
+auth_type=userpass
 password=ComplexPassBob_2025!
 username=6002
 [6002]
