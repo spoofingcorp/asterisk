@@ -188,12 +188,11 @@ contrib/scripts/get_mp3_source.sh
 
 make menuselect
 
-# Dans l'interface graphique (Menuselect) : Add-ons :
-# Cochez format_mp3 (si étape 1 réalisée).
-# Core Sound Packages
-# Décochez CORE-SOUNDS-EN-GSM.Cochez CORE-SOUNDS-FR-WAV (Standard).
-# Cochez CORE-SOUNDS-FR-G722 (Haute Définition).
+# Dans l'interface graphique (Menuselect) : Add-ons : Cochez format_mp3 (si étape 1 réalisée).
+# Core Sound Packages : Décochez CORE-SOUNDS-EN-GSM. Cochez CORE-SOUNDS-FR-WAV (Standard) et CORE-SOUNDS-FR-G722 (Haute Définition).
 # Music On Hold File Packages : Cochez MOH-OPSOUND-WAV.
+# Call Detail Recording (CDR) : DÉCOCHEZ cdr_radius (Cela évitera les erreurs radcli dans les logs).
+# Channel Event Logging (CEL) : DÉCOCHEZ cel_radius (Idem, pour éviter les erreurs de configuration RADIUS).
 # Save & Exit
 
 # 12. Compilation et InstallationCette étape compile le code source. (Comptez 5 à 15 minutes)
@@ -217,9 +216,7 @@ ldconfig
 # Créer le groupe et l'utilisateur système
 
 groupadd asterisk
-useradd -r -d /var/lib/asterisk -g asterisk asterisk
-
-# 19. Ajouter l'utilisateur aux groupes matériels nécessaires
+/usr/sbin/useradd -r -d /var/lib/asterisk -g asterisk asterisk 2>/dev/null || echo "User asterisk already exists"
 usermod -aG audio,dialout asterisk
 
 # 20. Donner les permissions sur les dossiers Asterisk
@@ -228,8 +225,9 @@ chown -R asterisk:asterisk /var/{lib,log,spool}/asterisk
 chown -R asterisk:asterisk /usr/lib/asterisk
 
 # Configuration du service pour utiliser cet utilisateur : Éditez le fichier de configuration par défaut :nano /etc/default/asterisk
-# Trouvez et décommentez (enlevez le #) les lignes suivantes pour qu'elles ressemblent à ceci :AST_USER="asterisk"
+# Trouvez et décommentez (enlevez le #) les lignes suivantes pour qu'elles ressemblent à ceci :
 
+AST_USER="asterisk"
 AST_GROUP="asterisk"
 
 # Sauvegardez (CTRL+O, Entrée) et quittez (CTRL+X).6. Démarrage et Vérification# 1. Démarrer le service
