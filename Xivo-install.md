@@ -2,6 +2,8 @@
 
 Ce guide détaille les étapes pour installer XiVO sur une machine virtuelle Debian 12 sans interface graphique.
 
+Source: https://myitknowledge.fr/installation-xivo-debian-12/
+
 ## Prérequis
 
 * **OS :** Debian 12 (Bookworm) - Installation minimale (Netinst / No GUI).
