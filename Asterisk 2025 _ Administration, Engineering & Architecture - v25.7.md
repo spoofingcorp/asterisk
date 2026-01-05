@@ -371,7 +371,7 @@ include => outbound-calls
 
 **extensions_custom.conf (Logique Métier) :**
 
-```
+```ini
 ; --- Extensions Locales (Appels entre postes) ---  
 [local-extensions]  
 exten => _6XXX,1,NoOp(Tentative de mise en relation vers le poste ${EXTEN})  
@@ -397,7 +397,7 @@ same => n,Hangup()
 
 **voicemail.conf (Boîtes Vocales) :**
 
-```
+```ini
 [general]  
 format=wav49|wav  
 attach=yes  
@@ -411,7 +411,7 @@ serveremail=asterisk@localhost
 
 **musiconhold.conf (Musique d'Attente) :**
 
-```
+```ini
 [default]  
 mode=files  
 directory=/var/lib/asterisk/sounds/moh  
@@ -492,7 +492,7 @@ Le parking permet de mettre un appel dans un "slot" public pour qu'il soit récu
 Exemple de fichier /etc/asterisk/features.conf  
 Ce fichier indique à Asterisk : "Quand l'utilisateur appuie sur telle touche, déclenche telle action".  
 
-```
+```ini
 [general]  
 transferdigittimeout => 3  
 parkext => 700           ; Parfois géré dans res_parking.conf  
@@ -526,11 +526,13 @@ C'est un problème classique. Si Asterisk et votre téléphone ne parlent pas la
 * **Scénario B (Échec) :** Vous ne voyez que des paquets audio. Votre téléphone envoie en "Inband" ou "SIP INFO".
 
 Corriger la configuration (PJSIP)  
-Dans pjsip_users.conf, forcez le mode standard :  
+Dans pjsip_users.conf, forcez le mode standard : 
+```ini
 [user-template](!)  
 ; ...  
 dtmf_mode=rfc4733  
 ; ...
+```
 
 *Note : Sur le softphone (ex: MicroSIP), réglez aussi le "DTMF Mode" sur **RFC 2833** ou **Auto** (Jamais Inband).*
 
