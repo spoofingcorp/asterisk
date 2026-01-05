@@ -1,3 +1,46 @@
+# Asterisk_Web_Admin
+
+Plutôt que d'installer une "usine à gaz" qui écraserait tout votre travail manuel, je vous propose de créer **votre propre mini-interface web d'administration** en Python (avec le framework léger Flask).
+
+Ce script va :
+
+1. Afficher un formulaire Web.
+2. Écrire les configurations directement dans vos fichiers `.conf`.
+3. Recharger Asterisk automatiquement.
+
+Voici le code complet de votre application d'administration.
+
+### Comment installer et lancer votre interface
+
+Cette interface est très légère et utilise Python, qui est déjà installé sur votre Debian.
+
+#### 1. Installer Flask (le mini-serveur web)
+
+```bash
+apt install python3-flask -y
+# Ou si pip est préféré : pip3 install flask
+
+#### 2. Créer le fichier
+Copiez le code ci-dessus dans un fichier nommé `/root/asterisk_admin.py` sur votre serveur.
+
+#### 3. Lancer l'application
+Puisque le script doit modifier des fichiers dans `/etc/asterisk`, il doit être lancé en **root**.
+
+```bash
+python3 /root/asterisk_admin.py
+
+#### 4. Utilisation
+Ouvrez votre navigateur et allez sur : `http://IP_DE_VOTRE_SERVEUR:5000`
+
+Remplissez le formulaire (ex: Extension **7003**, Nom **Charlie**, Pass **Secret**).
+Dès que vous validez :
+1.  Le script ajoute les lignes dans `pjsip_users.conf` et `voicemail.conf`.
+2.  Il exécute les commandes de reload Asterisk.
+3.  La ligne est immédiatement fonctionnelle (si vous restez dans la plage 6XXX ou 7XXX couverte par votre dialplan actuel).
+
+```
+
+
 import os
 import subprocess
 import re
@@ -105,39 +148,39 @@ def add_voicemail_user(ext, password, name, email):
 
 def check_and_update_dialplan(ext):
     """
-    Vérifie et met à jour extensions_custom.conf si le pattern _[67]XXX ne couvre pas le nouveau numéro.
-    Ex: Si on ajoute 8001, le pattern deviendra automatiquement _[678]XXX.
+    Vérifie si le routage pour la plage (ex: _8XXX) existe.
+    Sinon, ajoute un bloc dédié pour cette plage à la fin du fichier extensions_custom.conf.
+    Asterisk fusionnera automatiquement ce bloc avec le contexte [local-extensions] existant.
     """
     first_digit = str(ext)[0]
+    target_pattern = f"_{first_digit}XXX"
     
     try:
         with open(EXT_CUSTOM_FILE, "r") as f:
             content = f.read()
 
-        # Regex pour trouver le pattern existant type _[123]XXX
-        # On cherche une ligne qui contient "exten => _[" suivi de chiffres
-        match = re.search(r'exten => _\[([0-9]+)\]XXX', content)
-        
-        if match:
-            current_digits = match.group(1) # Ex: "67"
+        # On cherche si "exten => _8XXX" (ou _[...]) existe déjà dans le fichier
+        # On fait une recherche simple pour voir si le pattern est déjà défini
+        if f"exten => {target_pattern}" in content:
+            return False, None # Déjà présent
             
-            if first_digit not in current_digits:
-                # On ajoute le nouveau chiffre et on trie pour faire propre (ex: "678")
-                # set() élimine les doublons, sorted() trie
-                new_digits = "".join(sorted(set(current_digits + first_digit)))
-                
-                # On remplace dans le contenu: _[67]XXX devient _[678]XXX
-                old_pattern = f"_[{current_digits}]XXX"
-                new_pattern = f"_[{new_digits}]XXX"
-                new_content = content.replace(old_pattern, new_pattern)
-                
-                with open(EXT_CUSTOM_FILE, "w") as f:
-                    f.write(new_content)
-                return True, f"Dialplan mis à jour : {old_pattern} -> {new_pattern}"
-                
-        return False, None
+        # Si absent, on ajoute le bloc complet à la fin du fichier
+        # Note : Ré-ouvrir le contexte [local-extensions] est valide, Asterisk fusionne les blocs.
+        new_block = f"""
+; --- Ajout Automatique Plage {first_digit}XXX ---
+[local-extensions]
+exten => {target_pattern},1,NoOp(Appel vers le poste ${{EXTEN}})
+same => n,Dial(PJSIP/${{EXTEN}},30,m(default)tT)
+same => n,VoiceMail(${{EXTEN}}@default,u)
+same => n,Hangup()
+"""
+        with open(EXT_CUSTOM_FILE, "a") as f:
+            f.write(new_block)
+            
+        return True, f"Nouveau bloc de routage créé pour la plage {target_pattern}"
+
     except Exception as e:
-        return False, f"Erreur lecture dialplan: {str(e)}"
+        return False, f"Erreur modification dialplan: {str(e)}"
 
 # --- ROUTE FLASK ---
 
@@ -158,7 +201,7 @@ def home():
             add_pjsip_user(ext, pwd)
             add_voicemail_user(ext, "1234", name, email) # PIN voicemail par défaut 1234
             
-            # 2. Mise à jour dynamique du Dialplan si nécessaire
+            # 2. Ajout d'un bloc Dialplan si nécessaire (ex: _8XXX)
             updated, dp_msg = check_and_update_dialplan(ext)
             if updated:
                 detail = dp_msg
