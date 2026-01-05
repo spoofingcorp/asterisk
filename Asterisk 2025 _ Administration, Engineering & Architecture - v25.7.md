@@ -420,6 +420,8 @@ sort=random
 
 Rechargez les modules après création :  
 ```bash
+asterisk -rvvvv
+
 dialplan reload  
 module reload res_musiconhold.so  
 module reload app_voicemail.so
