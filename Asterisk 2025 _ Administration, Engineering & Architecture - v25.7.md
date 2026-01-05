@@ -59,40 +59,33 @@ Ce document sert de référence technique exhaustive pour les ingénieurs télé
 
 Le choix de la version d'Asterisk définit votre politique de maintenance sur le long terme.
 
-* **Asterisk 20 LTS (Long Term Support)** : C'est le socle industriel incontournable pour les environnements de production. Une version LTS garantit :
-* **Support de 5 ans** (jusqu'en 2027) : Correctifs de sécurité critiques sans changement de fonctionnalité.
-* **Stabilité des API/ABI** : Vos scripts AGI (Python/PHP), vos modules binaires compilés ou vos connecteurs de base de données (ODBC/Realtime) ne casseront pas lors d'une mise à jour mineure.
-* **Focus** : Idéal pour les opérateurs, centres d'appels et entreprises cherchant le "Set and Forget".
-
-
+* **Asterisk 20 LTS (Long Term Support)** : C'est le socle industriel incontournable pour les environnements de production. Une version LTS garantit :  
+* **Support de 5 ans** (jusqu'en 2027) : Correctifs de sécurité critiques sans changement de fonctionnalité.  
+* **Stabilité des API/ABI** : Vos scripts AGI (Python/PHP), vos modules binaires compilés ou vos connecteurs de base de données (ODBC/Realtime) ne casseront pas lors d'une mise à jour mineure.  
+* **Focus** : Idéal pour les opérateurs, centres d'appels et entreprises cherchant le "Set and Forget".  
 * **Asterisk 22 (Standard)** : Sortie fin 2024, cette version est réservée à la R&D. Elle introduit des ruptures technologiques (support étendu WebRTC, codecs vidéo 4K/VR, nouvelles API REST ARI). Son cycle de vie court (1 an) impose des migrations fréquentes, incompatibles avec une SLA de production élevée (99.999%).
 
 ### **1.2 PJSIP : Le Standard Unique**
 
 L'ancien pilote chan_sip (monolithique, single-threaded) a été définitivement retiré. **PJSIP** (basé sur la librairie PJPROJECT) offre une architecture modulaire :
 
-* **Architecture Asynchrone** : PJSIP utilise un pool de threads dynamique (distributor). Cela permet de traiter des dizaines de milliers de sessions simultanées sans bloquer le cœur du système ("deadlocks"), contrairement à chan_sip qui s'effondrait sous la charge.
-* **Abstraction "Sorcery"** : La configuration est découpée en objets logiques indépendants :
-* **Endpoint** : Profil technique (Codecs, Timers, DTMF, Contexte).
-* **AOR (Address of Record)** : Localisation réseau. Permet le **support multi-device** (un compte = plusieurs contacts : téléphone fixe + softphone mobile sonnant simultanément).
-* **Auth** : Identifiants de sécurité.
+* **Architecture Asynchrone** : PJSIP utilise un pool de threads dynamique (distributor). Cela permet de traiter des dizaines de milliers de sessions simultanées sans bloquer le cœur du système ("deadlocks"), contrairement à chan_sip qui s'effondrait sous la charge.  
+* **Abstraction "Sorcery"** : La configuration est découpée en objets logiques indépendants :  
+* **Endpoint** : Profil technique (Codecs, Timers, DTMF, Contexte).  
+* **AOR (Address of Record)** : Localisation réseau. Permet le **support multi-device** (un compte = plusieurs contacts : téléphone fixe + softphone mobile sonnant simultanément).  
+* **Auth** : Identifiants de sécurité.  
 * **Identify** : Méthode de reconnaissance pour les Trunks IP (matching par adresse IP source au lieu du username).
-
-
 
 ### **1.3 Sécurité Défensive et Bonnes Pratiques**
 
 Un IPBX exposé est attaqué dans les minutes qui suivent sa mise en ligne (Toll Fraud, SIP Scanning).
 
-* **Fail2Ban (IDS)** : Première ligne de défense. Il scanne `/var/log/asterisk/security`, détecte les motifs d'attaque (SIP 403/401 répétitifs, tentatives sur des users inexistants) et bannit dynamiquement les IP via iptables/nftables.
-* *Conseil Pro* : Configurez une bantime incrémentale (1h, puis 24h, puis 1 semaine).
-
-
-* **ACL (Access Control Lists)** : Restriction applicative dans `pjsip.conf`. Utilisez permit/deny pour whitelister strictement vos sous-réseaux LAN et les IP de signalisation de votre opérateur. Le reste du monde doit être bloqué.
-* **Chiffrement (TLS & SRTP)** : En 2025, le SIP en clair (UDP/5060) est une faille.
-* **TLS** : Chiffre la signalisation (qui appelle qui).
+* **Fail2Ban (IDS)** : Première ligne de défense. Il scanne /var/log/asterisk/security, détecte les motifs d'attaque (SIP 403/401 répétitifs, tentatives sur des users inexistants) et bannit dynamiquement les IP via iptables/nftables.  
+* *Conseil Pro* : Configurez une bantime incrémentale (1h, puis 24h, puis 1 semaine).  
+* **ACL (Access Control Lists)** : Restriction applicative dans pjsip.conf. Utilisez permit/deny pour whitelister strictement vos sous-réseaux LAN et les IP de signalisation de votre opérateur. Le reste du monde doit être bloqué.  
+* **Chiffrement (TLS & SRTP)** : En 2025, le SIP en clair (UDP/5060) est une faille.  
+* **TLS** : Chiffre la signalisation (qui appelle qui).  
 * **SRTP** : Chiffre la voix. Indispensable pour éviter l'écoute clandestine sur des réseaux non sûrs (WiFi public, Internet).
-
 
 
 ---
@@ -188,11 +181,12 @@ contrib/scripts/get_mp3_source.sh
 
 make menuselect
 
-# Dans l'interface graphique (Menuselect) : Add-ons : Cochez format_mp3 (si étape 1 réalisée).
-# Core Sound Packages : Décochez CORE-SOUNDS-EN-GSM. Cochez CORE-SOUNDS-FR-WAV (Standard) et CORE-SOUNDS-FR-G722 (Haute Définition).
-# Music On Hold File Packages : Cochez MOH-OPSOUND-WAV.
-# Call Detail Recording (CDR) : DÉCOCHEZ cdr_radius (Cela évitera les erreurs radcli dans les logs).
-# Channel Event Logging (CEL) : DÉCOCHEZ cel_radius (Idem, pour éviter les erreurs de configuration RADIUS).
+# Dans l'interface graphique (Menuselect) :   
+# Add-ons : Cochez format_mp3 (si étape source MP3 réalisée).  
+# Core Sound Packages : Décochez CORE-SOUNDS-EN-GSM. Cochez CORE-SOUNDS-FR-WAV et CORE-SOUNDS-FR-G722.  
+# Music On Hold File Packages : Cochez MOH-OPSOUND-WAV.  
+# Call Detail Recording (CDR) : DÉCOCHEZ cdr_radius.  
+# Channel Event Logging (CEL) : DÉCOCHEZ cel_radius.  
 # Save & Exit
 
 # 12. Compilation et InstallationCette étape compile le code source. (Comptez 5 à 15 minutes)
@@ -265,8 +259,6 @@ La VoIP traverse deux plans distincts :
 * **Control Plane (SIP - UDP/TCP 5060)** : Signalisation. Cible des attaques. À restreindre aux IP de confiance (Trunk, VPN, LAN).
 * **Data Plane (RTP - UDP 10000-20000)** : Audio. Doit être ouvert largement (0.0.0.0/0) en UDP.
 * *Pourquoi ?* L'audio vient souvent de Media Gateways (SBC) de l'opérateur dont les IP sont différentes de l'IP de signalisation et peuvent changer dynamiquement.
-
-
 * **QoS (DSCP)** : Marquez les paquets sortants avec DSCP 46 (EF - Expedited Forwarding) pour qu'ils soient prioritaires sur les routeurs/switchs de l'entreprise.
 
 ---
@@ -288,15 +280,19 @@ sudo touch pjsip.conf pjsip_users.conf pjsip_trunk.conf extensions.conf extensio
 **pjsip.conf (Infrastructure) :**
 
 ```ini
-[transport-udp]
-type=transport
-protocol=udp
-bind=0.0.0.0
-; local_net : CRITIQUE pour le NAT. Indique à Asterisk : "Si l'IP cible est dans ce réseau,
-; ne modifie pas les headers SIP, sinon, réécris l'IP publique".
-local_net=192.168.1.0/24
+[global]  
+type=global  
+user_agent=Asterisk PBX 22  
+; IMPORTANT : Force le realm pour correspondre à l'attente des softphones  
+default_realm=192.168.199.73
 
-#include pjsip_users.conf
+[transport-udp]  
+type=transport  
+protocol=udp  
+bind=0.0.0.0  
+local_net=192.168.1.0/24 ; Adaptez à votre réseau local
+
+#include pjsip_users.conf  
 #include pjsip_trunk.conf
 
 ```
@@ -304,74 +300,239 @@ local_net=192.168.1.0/24
 **pjsip_users.conf (Utilisateurs) :**
 
 ```ini
-[user-template](!)
-type=endpoint
-context=from-internal
-disallow=all
-; Ordre des codecs : HD (G722) > Standard Europe (ALAW/PCMA) > US (ULAW/PCMU)
-allow=g722,alaw,ulaw
-; direct_media=no : Asterisk reste "Man-in-the-Middle" pour l'audio.
-; Avantages : Enregistrement des appels possible, écoute discrète, isolation des VLANs voix,
-; résout 90% des problèmes de "One Way Audio" liés au NAT.
-direct_media=no
-; force_rport=yes : Force la réponse sur le port source du paquet reçu (contournement NAT client).
-force_rport=yes
-; rewrite_contact=yes : Réécrit l'IP du header Contact avec l'IP source du paquet IP (vital pour les utilisateurs nomades).
-rewrite_contact=yes
+[user-template](!)  
+type=endpoint  
+context=from-internal   ; Point d'entrée global pour accès aux extensions, trunks et services  
+disallow=all  
+; Ordre des codecs : HD (G722) > Standard Europe (ALAW/PCMA) > US (ULAW/PCMU)  
+allow=g722,alaw,ulaw  
+; DTMF Mode : Indispensable pour que les codes *2 et ## fonctionnent (voir section 4.4)  
+dtmf_mode=rfc4733  
+; direct_media=no : Asterisk reste "Man-in-the-Middle" pour l'audio.  
+direct_media=no  
+; force_rport=yes : Force la réponse sur le port source du paquet reçu (contournement NAT client).  
+force_rport=yes  
+; rewrite_contact=yes : Réécrit l'IP du header Contact (vital pour les utilisateurs nomades).  
+rewrite_contact=yes  
 mailboxes=${ENDPOINT}@default
 
-[6001](user-template)
-auth=auth6001
-aors=6001
-[auth6001]
-type=auth
-auth_type=userpass
-password=ComplexPassAlice_2025!
-username=6001
-[6001]
-type=aor
-max_contacts=2 ; Permet à Alice d'avoir PC et Mobile connectés en même temps.
+[6001](user-template)  
+auth=auth6001  
+aors=6001  
+[auth6001]  
+type=auth  
+auth_type=userpass  
+password=1234  
+username=6001  
+[6001]  
+type=aor  
+max_contacts=2
 
-[6002](user-template)
-auth=auth6002
-aors=6002
-[auth6002]
-type=auth
-auth_type=userpass
-password=ComplexPassBob_2025!
-username=6002
-[6002]
-type=aor
+[6002](user-template)  
+auth=auth6002  
+aors=6002  
+[auth6002]  
+type=auth  
+auth_type=userpass  
+password=5678  
+username=6002  
+[6002]  
+type=aor  
 max_contacts=1
 
 ```
 
+### **4.2 Activation du Dialplan et des Ressources (Pré-requis Test)**
+
+Pour permettre le premier appel de test entre 6001 et 6002, il est indispensable de configurer immédiatement le plan de numérotation, les boîtes vocales et la musique d'attente.
+
+**extensions.conf (Le Squelette) :**
+
+```ini
+[general]  
+static=yes  
+writeprotect=no
+
+[globals]  
+SDA_STANDARD=0188001122  
+TRUNK=PJSIP/trunk-provider
+
+#include extensions_custom.conf
+
+; --- CONTEXTE PRINCIPAL ---  
+; Ce contexte ne doit contenir QUE des includes.  
+; NE PAS AJOUTER de lignes "exten => _X." ou de "Goto" ici,  
+; sinon vous écraserez la logique des sous-contextes.  
+[from-internal]  
+include => local-extensions  
+include => internal-services  
+include => outbound-calls
+```
+
+**extensions_custom.conf (Logique Métier) :**
+
+```
+; --- Extensions Locales (Appels entre postes) ---  
+[local-extensions]  
+exten => _6XXX,1,NoOp(Tentative de mise en relation vers le poste ${EXTEN})  
+; Ajout des options t (transfert appelé) et T (transfert appelant)  
+same => n,Dial(PJSIP/${EXTEN},30,m(default)tT)  
+same => n,VoiceMail(${EXTEN}@default,u)  
+same => n,Hangup()
+
+; --- Services Internes ---  
+[internal-services]  
+include => parkedcalls  
+exten => *97,1,VoiceMailMain(${CALLERID(num)}@default)  
+; File d'attente support  
+exten => 800,1,Queue(support-queue,t)
+
+; --- Appels Sortants ---  
+[outbound-calls]  
+; Pattern matching : 0 + 9 chiffres (Format France)  
+exten => _0[1-9]XXXXXXXX,1,Set(CALLERID(all)="Societe ABC" <${SDA_STANDARD}>)  
+same => n,Dial(${TRUNK}/${EXTEN})  
+same => n,Hangup()
+```
+
+**voicemail.conf (Boîtes Vocales) :**
+
+```
+[general]  
+format=wav49|wav  
+attach=yes  
+serveremail=asterisk@localhost
+
+[default]  
+; Syntaxe : extension => mot_de_passe,Nom Complet,Email  
+6001 => 1234,Alice Doe,alice@example.com  
+6002 => 5678,Bob Doe,bob@example.com
+```
+
+**musiconhold.conf (Musique d'Attente) :**
+
+```
+[default]  
+mode=files  
+directory=/var/lib/asterisk/sounds/moh  
+sort=random
+```
+
+Rechargez les modules après création :  
+dialplan reload  
+module reload res_musiconhold.so  
+module reload app_voicemail.so
+
+
 #### **🛑 MISE EN SITUATION : TEST TRANSCODAGE**
 
-**Objectif :** Valider la capacité de transcodage (coûteuse en CPU).
+**Objectif :** Valider la capacité de transcodage (coûteuse en CPU) maintenant que le dialplan est actif.
+  
+1. **Appel :** Lancez l'appel de 6001 vers 6002.  
+2. **Observation :** core show channels affichera les formats. Le serveur décode le GSM vers PCM, puis ré-encode en G722. C'est transparent pour l'utilisateur mais charge le CPU.
 
-1. **Config :** Forcez un softphone en GSM (si dispo) et l'autre en G722.
-2. **Appel :** Lancez l'appel.
-3. **Observation :** `core show channels` affichera les formats. Le serveur décode le GSM vers PCM, puis ré-encode en G722. C'est transparent pour l'utilisateur mais charge le CPU.
-
-### **4.2 Musique d'Attente (MoH)**
+### **4.3 Musique d'Attente (Théorie & Optimisation)**
 
 Le transcodage MP3 -> SLIN -> ALAW consomme énormément de CPU. En production, **convertissez vos fichiers en WAV (8kHz, 16bit, Mono)** ou directement en .alaw pour que le serveur n'ait qu'à copier les octets vers le réseau sans traitement.
 
-```ini
-[default]
-mode=files
-directory=/var/lib/asterisk/sounds/moh
-sort=random
+### **4.4 Gestion des Transferts, Codes Services et Diagnostic DTMF**
 
-[commercial]
-mode=files
-directory=/var/lib/asterisk/sounds/custom_marketing
-sort=alpha ; Lecture séquentielle (Pub 1, Pub 2...)
+Sur Asterisk 22, comme sur les versions précédentes, la gestion des transferts et des services dépend largement de votre configuration. Cependant, voici les **codes standards par défaut** utilisés par la très grande majorité des systèmes.
+
+#### **1. Transférer un appel depuis un poste**
+
+Il existe deux types de transferts. Pour les utiliser, vous devez taper ces codes sur le clavier de votre téléphone **pendant la conversation**.
+
+A. Transfert Assisté (Attended Transfer)  
+C'est la méthode recommandée. Vous parlez au destinataire avant de lui passer l'appel.
+
+1. Pendant l'appel, tapez ***2** (ou parfois *).  
+2. L'interlocuteur est mis en attente et vous entendez "Transfert".  
+3. Composez le numéro du destinataire (extension).  
+4. Annoncez l'appel :  
+   * **S'il accepte :** Raccrochez simplement. Les deux parties seront connectées.  
+   * **S'il refuse ou ne répond pas :** Attendez que ça raccroche ou appuyez sur une touche d'annulation (souvent *) pour reprendre l'appel initial.
+
+B. Transfert Aveugle (Blind Transfer)  
+Vous transférez l'appel immédiatement sans prévenir le destinataire.
+
+1. Pendant l'appel, tapez **##** (ou parfois #).  
+2. Vous entendez "Transfert".  
+3. Composez le numéro du destinataire.  
+4. Raccrochez immédiatement.
+
+**Note importante :** Si ces codes ne fonctionnent pas, c'est que la fonctionnalité "In-Call Asterisk Blind/Attended Transfer" n'est pas activée pour votre extension, ou que les codes ont été modifiés dans le fichier features.conf.
+
+#### **2. Les Extensions (Feature Codes) Utiles**
+
+Ces codes se composent généralement **depuis la tonalité** (comme si vous passiez un appel normal). Voici les standards les plus courants :
+
+| Fonction | Code Standard | Description |
+| :---- | :---- | :---- |
+| **Renvoi inconditionnel (Activer)** | ***72** | Redirige tous les appels vers un autre numéro. |
+| **Renvoi inconditionnel (Désactiver)** | ***73** | Annule le renvoi d'appel. |
+| **Ne pas déranger (DND)** | ***78** | Active le mode "Ne pas déranger" (sonne occupé). |
+| **Interception d'appel (Pickup)** | ***8** | Prend un appel qui sonne sur un autre poste du même groupe. |
+| **Ma Messagerie** | ***97** | Consulter la boîte vocale du poste actuel. |
+| **Messagerie Générale** | ***98** | Consulter la boîte vocale d'un *autre* poste. |
+
+Parking d'Appel (Call Parking)  
+Le parking permet de mettre un appel dans un "slot" public pour qu'il soit récupéré depuis n'importe quel autre poste.
+
+1. **Parker un appel :** Faites un transfert aveugle (**##**) vers le numéro **70** (ou 700). Le système annoncera le numéro du slot (ex: *"71"*).  
+2. **Récupérer un appel :** Depuis n'importe quel poste, composez le numéro du slot (ex: **71**).
+
+**Outils de diagnostic**
+
+* **Test d'écho (Echo Test) : *43** : Utile pour tester la latence.  
+* **Horloge parlante : *60** : Pour vérifier l'heure système.
+
+#### **3. Vérification de la configuration**
+
+Exemple de fichier /etc/asterisk/features.conf  
+Ce fichier indique à Asterisk : "Quand l'utilisateur appuie sur telle touche, déclenche telle action".  
 
 ```
+[general]  
+transferdigittimeout => 3  
+parkext => 700           ; Parfois géré dans res_parking.conf  
+context => parkedcalls   ; Le contexte où atterrissent les appels garés
 
-*Application : `asterisk -rx "moh reload"*`
+[featuremap]  
+blindxfer => ##          ; Transfert Aveugle  
+atxfer => *2             ; Transfert Assisté  
+disconnect => *0         ; Raccrocher  
+automon => *1            ; Enregistrement à la volée  
+parkcall => #72          ; Parking direct
+```
+
+**Points Importants pour que ça fonctionne**
+
+1. **Les options de la commande Dial()** : Dans extensions.conf, vous **devez** ajouter les options t ou T.  
+   * t : L'appelé peut transférer.  
+   * T : L'appelant peut transférer.  
+   * *Exemple :* Dial(PJSIP/${EXTEN},30,tT)  
+2. **Le module Parking** : Assurez-vous que res_parking.so est chargé et configuré dans res_parking.conf.
+
+#### **4. Diagnostic DTMF (Si les touches ne marchent pas)**
+
+C'est un problème classique. Si Asterisk et votre téléphone ne parlent pas la même "langue" pour les touches, Asterisk n'entendra jamais le ##.
+
+**Diagnostiquer le DTMF en temps réel**
+
+1. Dans la console Asterisk (asterisk -rvvv), activez le debug RTP : rtp set debug on  
+2. Passez un appel et appuyez sur une touche (ex: **5**).  
+* **Scénario A (Succès) :** Vous voyez Got RTP RFC2833 ... Event: 5. Asterisk reçoit le code.  
+* **Scénario B (Échec) :** Vous ne voyez que des paquets audio. Votre téléphone envoie en "Inband" ou "SIP INFO".
+
+Corriger la configuration (PJSIP)  
+Dans pjsip_users.conf, forcez le mode standard :  
+[user-template](!)  
+; ...  
+dtmf_mode=rfc4733  
+; ...
+
+*Note : Sur le softphone (ex: MicroSIP), réglez aussi le "DTMF Mode" sur **RFC 2833** ou **Auto** (Jamais Inband).*
 
 ### **4.3 Call Center : Stratégies ACD**
 
