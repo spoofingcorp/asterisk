@@ -279,7 +279,7 @@ sudo touch pjsip.conf pjsip_users.conf pjsip_trunk.conf extensions.conf extensio
 
 **pjsip.conf (Infrastructure) :**
 
-```ini
+```bash
 [global]  
 type=global  
 user_agent=Asterisk PBX 22  
@@ -299,7 +299,7 @@ local_net=192.168.1.0/24 ; Adaptez à votre réseau local
 
 **pjsip_users.conf (Utilisateurs) :**
 
-```ini
+```bash
 [user-template](!)  
 type=endpoint  
 context=from-internal   ; Point d'entrée global pour accès aux extensions, trunks et services  
@@ -348,7 +348,7 @@ Pour permettre le premier appel de test entre 6001 et 6002, il est indispensable
 
 **extensions.conf (Le Squelette) :**
 
-```ini
+```bash
 [general]  
 static=yes  
 writeprotect=no
@@ -371,7 +371,7 @@ include => outbound-calls
 
 **extensions_custom.conf (Logique Métier) :**
 
-```ini
+```bash
 ; --- Extensions Locales (Appels entre postes) ---  
 [local-extensions]  
 exten => _6XXX,1,NoOp(Tentative de mise en relation vers le poste ${EXTEN})  
@@ -397,7 +397,7 @@ same => n,Hangup()
 
 **voicemail.conf (Boîtes Vocales) :**
 
-```ini
+```bash
 [general]  
 format=wav49|wav  
 attach=yes  
@@ -411,7 +411,7 @@ serveremail=asterisk@localhost
 
 **musiconhold.conf (Musique d'Attente) :**
 
-```ini
+```bash
 [default]  
 mode=files  
 directory=/var/lib/asterisk/sounds/moh  
@@ -494,7 +494,7 @@ Le parking permet de mettre un appel dans un "slot" public pour qu'il soit récu
 Exemple de fichier /etc/asterisk/features.conf  
 Ce fichier indique à Asterisk : "Quand l'utilisateur appuie sur telle touche, déclenche telle action".  
 
-```ini
+```bash
 [general]  
 transferdigittimeout => 3  
 parkext => 700           ; Parfois géré dans res_parking.conf  
@@ -529,7 +529,7 @@ C'est un problème classique. Si Asterisk et votre téléphone ne parlent pas la
 
 Corriger la configuration (PJSIP)  
 Dans pjsip_users.conf, forcez le mode standard : 
-```ini
+```bash
 [user-template](!)  
 ; ...  
 dtmf_mode=rfc4733  
@@ -542,7 +542,7 @@ dtmf_mode=rfc4733
 
 **queues.conf :**
 
-```ini
+```bash
 [support-queue]
 musicclass=default
 ; strategy=rrmemory : Round Robin Memory. Distribue équitablement en se souvenant du dernier agent
@@ -571,7 +571,7 @@ La gestion des **Timers** et du **Keepalive** est vitale pour détecter une coup
 
 **pjsip_trunk.conf :**
 
-```ini
+```bash
 [trunk-provider]
 type=registration
 outbound_auth=auth-trunk
@@ -608,7 +608,7 @@ contact=sip:sip.provider.com
 
 **extensions.conf (Le Squelette) :**
 
-```ini
+```bash
 [general]
 static=yes
 writeprotect=no
@@ -628,7 +628,7 @@ include => outbound-calls
 
 **extensions_custom.conf (Logique Métier) :**
 
-```ini
+```bash
 ; --- Extensions Locales ---
 [local-extensions]
 exten => _6XXX,1,NoOp(Appel Interne de ${CALLERID(num)} vers ${EXTEN})
@@ -679,7 +679,7 @@ same => n,Hangup()
 
 L'IVR (*Interactive Voice Response*) permet d'aiguiller l'appel.
 
-```ini
+```bash
 [ivr-principal]
 exten => s,1,Answer()
 ; Background() : Joue le son ET écoute les touches DTMF (Barge-in).
@@ -720,7 +720,7 @@ IAX2 (Inter-Asterisk eXchange) est supérieur au SIP pour les liens inter-sites 
 
 **iax.conf :**
 
-```ini
+```bash
 [site-distant]
 type=friend
 host=1.2.3.4       ; IP du site distant
