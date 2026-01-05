@@ -269,9 +269,9 @@ La VoIP traverse deux plans distincts :
 
 ```bash
 cd /etc/asterisk
-sudo mkdir -p backups/original_conf
-sudo mv pjsip.conf extensions.conf queues.conf voicemail.conf musiconhold.conf backups/original_conf/
-sudo touch pjsip.conf pjsip_users.conf pjsip_trunk.conf extensions.conf extensions_custom.conf queues.conf voicemail.conf musiconhold.conf
+ mkdir -p backups/original_conf
+ mv pjsip.conf extensions.conf queues.conf voicemail.conf musiconhold.conf backups/original_conf/
+ touch pjsip.conf pjsip_users.conf pjsip_trunk.conf extensions.conf extensions_custom.conf queues.conf voicemail.conf musiconhold.conf
 
 ```
 
@@ -755,7 +755,7 @@ Le SIP fonctionne (le téléphone sonne), mais l'audio est hachuré, robotique o
 1. **Capture Serveur (Full Payload) :**
 ```bash
 # Capture brute sur l'interface (-i any) sans tronquer les paquets (-s 0)
-sudo tcpdump -i any -s 0 -w /tmp/debug_audio.pcap udp port 5060 or udp portrange 10000-20000
+tcpdump -n -i any -s 0 -w capture_voip.pcap port 5060 or portrange 10000-20000
 
 ```
 
