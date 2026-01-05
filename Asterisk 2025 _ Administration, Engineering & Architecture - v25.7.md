@@ -419,9 +419,11 @@ sort=random
 ```
 
 Rechargez les modules après création :  
+```bash
 dialplan reload  
 module reload res_musiconhold.so  
 module reload app_voicemail.so
+```
 
 
 #### **🛑 MISE EN SITUATION : TEST TRANSCODAGE**
